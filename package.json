@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "build": "npm install"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
