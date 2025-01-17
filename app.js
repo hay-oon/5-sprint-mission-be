@@ -22,12 +22,7 @@ app.use(express.json());
 
 // MongoDB 연결 설정 수정
 mongoose
-  .connect(DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-  })
+  .connect(DATABASE_URL)
   .then(() => {
     console.log("Connected to MongoDB");
   })
