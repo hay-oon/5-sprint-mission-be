@@ -1,177 +1,13 @@
-### 상품 등록
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "맥북 프로 16인치",
-    "description": "2023년형 맥북 프로 16인치 모델입니다",
-    "price": 3600000,
-    "tags": ["애플", "노트북", "맥북"]
-}
-
-### 상품 등록 - 노트북
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "맥북 프로 16인치",
-    "description": "2023년형 M2 프로세서 탑재 모델",
-    "price": 3600000,
-    "tags": ["애플", "노트북", "맥북"]
-}
-
-### 상품 등록 - 스마트폰
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "아이폰 15 Pro",
-    "description": "A17 Pro 칩 탑재, 티타늄 소재 적용",
-    "price": 1550000,
-    "tags": ["애플", "스마트폰", "아이폰"]
-}
-
-### 상품 등록 - 태블릿
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "아이패드 프로 12.9",
-    "description": "M2 칩셋, Liquid Retina XDR 디스플레이",
-    "price": 1729000,
-    "tags": ["애플", "태블릿", "아이패드"]
-}
-
-### 상품 등록 - 이어폰
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "에어팟 프로 2세대",
-    "description": "액티브 노이즈 캔슬링, H2 칩",
-    "price": 359000,
-    "tags": ["애플", "이어폰", "무선"]
-}
-
-### 상품 등록 - 스마트워치
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "애플워치 시리즈 9",
-    "description": "S9 칩, 더블탭 제스처 지원",
-    "price": 599000,
-    "tags": ["애플", "스마트워치", "웨어러블"]
-}
-
-### 상품 등록 - 게이밍 노트북
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "레이저 블레이드 16",
-    "description": "RTX 4090 탑재, QHD+ 240Hz",
-    "price": 4500000,
-    "tags": ["레이저", "노트북", "게이밍"]
-}
-
-### 상품 등록 - 모니터
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "LG 울트라파인 32UN880",
-    "description": "4K UHD, USB-C, 인체공학 스탠드",
-    "price": 1290000,
-    "tags": ["LG", "모니터", "4K"]
-}
-
-### 상품 등록 - 키보드
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "키크론 K8 Pro",
-    "description": "무선 기계식 키보드, QMK/VIA 지원",
-    "price": 189000,
-    "tags": ["키크론", "키보드", "기계식"]
-}
-
-### 상품 등록 - 마우스
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "로지텍 MX Master 3S",
-    "description": "8000 DPI 센서, 무소음 클릭",
-    "price": 139000,
-    "tags": ["로지텍", "마우스", "무선"]
-}
-
-### 상품 등록 - 스피커
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "소노스 Era 300",
-    "description": "공간 음향, 돌비 애트모스 지원",
-    "price": 699000,
-    "tags": ["소노스", "스피커", "홈오디오"]
-}
-
-### 상품 등록 - 카메라
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "소니 A7M4",
-    "description": "3300만 화소, 4K 60p 촬영",
-    "price": 2890000,
-    "tags": ["소니", "카메라", "미러리스"]
-}
-
-### 상품 등록 - 게임기
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "플레이스테이션 5",
-    "description": "디지털 에디션, DualSense 컨트롤러",
-    "price": 628000,
-    "tags": ["소니", "게임기", "콘솔"]
-}
-
-### 상품 등록 - 프린터
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "엡손 EcoTank L8180",
-    "description": "6색 잉크, A3 출력 지원",
-    "price": 989000,
-    "tags": ["엡손", "프린터", "복합기"]
-}
-
-### 상품 등록 - 공유기
-POST http://localhost:3003/api/products
-Content-Type: application/json
-
-{
-    "name": "유비쿼티 드림머신",
-    "description": "Wi-Fi 6E, 10Gbps 포트",
-    "price": 459000,
-    "tags": ["유비쿼티", "공유기", "네트워크"]
-}
 
 ### 상품 등록 - 외장하드
 POST http://localhost:3003/api/products
 Content-Type: application/json
 
 {
-    "name": "삼성 T7 Shield",
-    "description": "2TB, USB 3.2 Gen2, IP65 등급",
-    "price": 289000,
-    "tags": ["삼성", "외장하드", "저장장치"]
+    "name": "갤럭시 북 3 울트라",
+    "description": "13세대 인텔 i7, RTX 4070 탑재",
+    "price": 3200000,
+    "tags": ["삼성", "노트북", "갤럭시"]
 }
 
 ### 상품 목록 조회 (기본)
@@ -196,4 +32,4 @@ Content-Type: application/json
 }
 
 ### 상품 삭제
-DELETE http://localhost:3003/api/products/{{productId}} 
+DELETE http://localhost:3003/api/products/67889f25dd305ff96a8d82b7

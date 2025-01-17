@@ -1,4 +1,4 @@
-import Product from "../models/Product.js";
+import Product from "../../models/Product.js";
 
 // 상품 등록
 export const createProduct = async (req, res) => {
@@ -16,26 +16,31 @@ export const createProduct = async (req, res) => {
 // id name price createdAt
 // 페이지네이션 적용
 // 검색 기능 추가 - name, description
+
 export const getProducts = async (req, res) => {
   try {
-    const { page = 1, limit = 10, keyword } = req.query;
+    const { page = 1, pageSize = 10, keyword } = req.query;
 
     const query = {};
     if (keyword) {
-      query.$text = { $search: keyword };
+      // 정규식 검색 조건
+      query.$or = [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ];
     }
 
     const products = await Product.find(query)
       .select("id name price createdAt")
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .sort({ createdAt: -1 }) // 최신 순 정렬
+      .skip((page - 1) * pageSize)
+      .limit(Number(pageSize));
 
     const total = await Product.countDocuments(query);
 
     res.status(200).send({
       products,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / pageSize),
       currentPage: Number(page),
     });
   } catch (err) {
