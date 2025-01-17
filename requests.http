@@ -1,0 +1,35 @@
+
+### 상품 등록 - 외장하드
+POST http://localhost:3003/api/products
+Content-Type: application/json
+
+{
+    "name": "갤럭시 북 3 울트라",
+    "description": "13세대 인텔 i7, RTX 4070 탑재",
+    "price": 3200000,
+    "tags": ["삼성", "노트북", "갤럭시"]
+}
+
+### 상품 목록 조회 (기본)
+GET http://localhost:3003/api/products
+
+### 상품 목록 조회 (페이지네이션)
+GET http://localhost:3003/api/products?page=1&limit=10
+
+### 상품 목록 조회 (검색)
+GET http://localhost:3003/api/products?keyword=맥북
+
+### 상품 상세 조회
+GET http://localhost:3003/api/products/67889f25dd305ff96a8d82b7
+
+### 상품 수정
+PATCH http://localhost:3003/api/products/67889f13dd305ff96a8d82ab
+Content-Type: application/json
+
+{
+    "price": 3500000,
+    "description": "2023년형 맥북 프로 16인치 M2 모델입니다"
+}
+
+### 상품 삭제
+DELETE http://localhost:3003/api/products/67889f25dd305ff96a8d82b7
