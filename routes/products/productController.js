@@ -31,8 +31,8 @@ export const getProducts = async (req, res) => {
     }
 
     const products = await Product.find(query)
-      .select("id name price createdAt") // 조회할 필드 선택
-      .sort({ createdAt: -1 }) // 최신 순 정렬
+      .select("id name description price createdAt") // description 필드 추가
+      .sort({ createdAt: -1 }) // 내림차순 (최신순) 정렬, "desc"와 같음
       .skip((page - 1) * pageSize) // 페이지네이션
       .limit(Number(pageSize)); // 페이지네이션
 
