@@ -7,16 +7,10 @@ import apiRoutes from "./routes/index.js";
 dotenv.config();
 
 const app = express();
-const { DATABASE_URL, PORT, ALLOWED_ORIGINS } = process.env;
+const { DATABASE_URL, PORT } = process.env;
 
 // CORS 설정
-app.use(
-  cors({
-    origin: ALLOWED_ORIGINS ? ALLOWED_ORIGINS.split(",") : "*",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 

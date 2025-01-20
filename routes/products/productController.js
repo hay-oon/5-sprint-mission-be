@@ -25,16 +25,16 @@ export const getProducts = async (req, res) => {
     if (keyword) {
       // 정규식 검색 조건
       query.$or = [
-        { name: { $regex: keyword, $options: "i" } },
+        { name: { $regex: keyword, $options: "i" } }, // regex: 정규식 검색, options: 대소문자 구분 없음
         { description: { $regex: keyword, $options: "i" } },
       ];
     }
 
     const products = await Product.find(query)
-      .select("id name price createdAt")
-      .sort({ createdAt: -1 }) // 최신 순 정렬
-      .skip((page - 1) * pageSize)
-      .limit(Number(pageSize));
+      .select("id name description price createdAt") // description 필드 추가
+      .sort({ createdAt: -1 }) // 내림차순 (최신순) 정렬, "desc"와 같음
+      .skip((page - 1) * pageSize) // 페이지네이션
+      .limit(Number(pageSize)); // 페이지네이션
 
     const total = await Product.countDocuments(query);
 
@@ -54,7 +54,7 @@ export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findById(id).select(
-      "id name description price tags createdAt"
+      "id name description price tags createdAt" // 조회할 필드 선택
     );
     if (!product) {
       return res.status(404).send({ message: "Product not found" });
