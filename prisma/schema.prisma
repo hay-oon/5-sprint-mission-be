@@ -1,0 +1,21 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["prismaSchemaFolder"] // 스키마를 분리할 수 있게 해줌
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Product {
+    id          String   @id @default(uuid())
+    idx         Int      @default(autoincrement())
+    name        String
+    description String
+    price       Int
+    tags        String[]
+    image       String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}

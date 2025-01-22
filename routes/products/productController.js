@@ -1,12 +1,20 @@
-import Product from "../../models/Product.js";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 // 상품 등록
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, tags } = req.body;
-    const product = new Product({ name, description, price, tags });
-    const savedProduct = await product.save();
-    res.status(201).send(savedProduct);
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description,
+        price,
+        tags,
+      },
+    });
+    res.status(201).send(product);
   } catch (err) {
     res.status(400).send({ message: err.message });
   }
@@ -21,22 +29,31 @@ export const getProducts = async (req, res) => {
   try {
     const { page = 1, pageSize = 10, keyword } = req.query;
 
-    const query = {};
-    if (keyword) {
-      // 정규식 검색 조건
-      query.$or = [
-        { name: { $regex: keyword, $options: "i" } }, // regex: 정규식 검색, options: 대소문자 구분 없음
-        { description: { $regex: keyword, $options: "i" } },
-      ];
-    }
+    const where = keyword
+      ? {
+          OR: [
+            { name: { contains: keyword, mode: "insensitive" } },
+            { description: { contains: keyword, mode: "insensitive" } },
+          ],
+        }
+      : {};
 
-    const products = await Product.find(query)
-      .select("id name description price createdAt") // description 필드 추가
-      .sort({ createdAt: -1 }) // 내림차순 (최신순) 정렬, "desc"와 같음
-      .skip((page - 1) * pageSize) // 페이지네이션
-      .limit(Number(pageSize)); // 페이지네이션
-
-    const total = await Product.countDocuments(query);
+    const products = await prisma.product.findMany({
+      where, //
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: (Number(page) - 1) * Number(pageSize),
+      take: Number(pageSize),
+    });
+    const total = await prisma.product.count({ where }); // [products, total] = await Promise.all 로 묶어서 비동기 처리가능
 
     res.status(200).send({
       products,
@@ -53,9 +70,18 @@ export const getProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).select(
-      "id name description price tags createdAt" // 조회할 필드 선택
-    );
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        createdAt: true,
+      },
+    });
+
     if (!product) {
       return res.status(404).send({ message: "Product not found" });
     }
@@ -73,15 +99,16 @@ export const updateProduct = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const product = await Product.findByIdAndUpdate(id, updates, {
-      new: true, // 업데이트된 데이터 반환 by mongoose
-      runValidators: true, // 유효성 검사 실행 by mongoose
+    const product = await prisma.product.update({
+      where: { id },
+      data: updates,
     });
-    if (!product) {
-      return res.status(404).send({ message: "Product not found" });
-    }
+
     res.status(200).send(product);
   } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "Product not found" });
+    }
     res.status(500).send({ message: err.message });
   }
 };
@@ -90,12 +117,15 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
-    if (!product) {
-      return res.status(404).send({ message: "Product not found" });
-    }
+    await prisma.product.delete({
+      where: { id },
+    });
+
     res.status(200).send({ message: "Product deleted successfully" });
   } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "Product not found" });
+    }
     res.status(500).send({ message: err.message });
   }
 };
