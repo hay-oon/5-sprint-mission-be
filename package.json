@@ -4,7 +4,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "build": "npm install",
-    "seed": "node prisma/seed.js"
+    "seed": "node --experimental-modules prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
@@ -32,6 +32,6 @@
     "prisma": "^6.2.1"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node --experimental-modules prisma/seed.js"
   }
 }
