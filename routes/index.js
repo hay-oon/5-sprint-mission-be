@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.use("/products", productRoutes);
 router.use("/articles", articleRoutes);
-router.use("/comments", commentRoutes);
+router.use("/", commentRoutes);
 
 export default router;

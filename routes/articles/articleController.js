@@ -118,7 +118,7 @@ const deleteArticle = async (req, res) => {
       where: { id },
     });
 
-    res.status(204).send({ message: "Article deleted successfully" });
+    res.status(200).send({ message: "Article deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {
       return res.status(404).send({ message: "Article not found" });
