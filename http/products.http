@@ -19,7 +19,7 @@ GET http://localhost:5005/api/products?page=1&limit=10
 GET http://localhost:5005/api/products?keyword=갤럭시
 
 ### 상품 상세 조회
-GET http://localhost:5005/api/products/58ac182e-ea6f-4e82-ac2e-0ff4ff11dfc4
+GET http://localhost:5005/api/products/7cad3e36-f968-4af7-8741-36129588369f
 
 ### 상품 수정
 PATCH http://localhost:5005/api/products/58ac182e-ea6f-4e82-ac2e-0ff4ff11dfc4

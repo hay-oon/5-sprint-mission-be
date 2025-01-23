@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // 상품 등록
-export const createProduct = async (req, res) => {
+const createProduct = async (req, res) => {
   try {
     const { name, description, price, tags } = req.body;
     const product = await prisma.product.create({
@@ -25,7 +25,7 @@ export const createProduct = async (req, res) => {
 // 페이지네이션 적용
 // 검색 기능 추가 - name, description
 
-export const getProducts = async (req, res) => {
+const getProducts = async (req, res) => {
   try {
     const { page = 1, pageSize = 10, keyword } = req.query;
 
@@ -39,7 +39,7 @@ export const getProducts = async (req, res) => {
       : {};
 
     const products = await prisma.product.findMany({
-      where, //
+      where,
       select: {
         id: true,
         name: true,
@@ -47,9 +47,7 @@ export const getProducts = async (req, res) => {
         price: true,
         createdAt: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       skip: (Number(page) - 1) * Number(pageSize),
       take: Number(pageSize),
     });
@@ -57,7 +55,8 @@ export const getProducts = async (req, res) => {
 
     res.status(200).send({
       products,
-      totalPages: Math.ceil(total / pageSize),
+      total,
+      totalPages: Math.ceil(total / Number(pageSize)),
       currentPage: Number(page),
     });
   } catch (err) {
@@ -67,7 +66,7 @@ export const getProducts = async (req, res) => {
 
 // 상품 상세 조회
 // id name description price tags createdAt
-export const getProductById = async (req, res) => {
+const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
@@ -94,14 +93,14 @@ export const getProductById = async (req, res) => {
 // 상품 수정
 // patch 메서드 사용
 // id name description price tags
-export const updateProduct = async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const { name, description, price, tags } = req.body;
 
     const product = await prisma.product.update({
       where: { id },
-      data: updates,
+      data: { name, description, price, tags },
     });
 
     res.status(200).send(product);
@@ -114,9 +113,10 @@ export const updateProduct = async (req, res) => {
 };
 
 // 상품 삭제
-export const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
+
     await prisma.product.delete({
       where: { id },
     });
@@ -128,4 +128,12 @@ export const deleteProduct = async (req, res) => {
     }
     res.status(500).send({ message: err.message });
   }
+};
+
+export {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
 };
