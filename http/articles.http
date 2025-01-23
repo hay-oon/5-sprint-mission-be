@@ -10,20 +10,18 @@ Content-Type: application/json
 ### 게시글 목록 조회 (기본)
 GET http://localhost:5005/api/articles
 
-### 게시글 목록 조회 (페이지네이션)
-GET http://localhost:5005/api/articles?page=1&limit=10
-
 ### 게시글 목록 조회 (검색)
-GET http://localhost:5005/api/articles?search=테스트
+GET http://localhost:5005/api/articles?keyword=테스트
 
 ### 게시글 목록 조회 (최신순 정렬)
 GET http://localhost:5005/api/articles?sort=recent
 
+@articleId = 899297fe-7e63-4ba6-91f1-340b417b0d55
+
 ### 게시글 상세 조회
-GET http://localhost:5005/api/articles/783366cc-103e-44a0-b886-28c61b447681
+GET http://localhost:5005/api/articles/{{articleId}}
 
 ### 게시글 수정
-# @prompt articleId 게시글 ID를 입력하세요
 PATCH http://localhost:5005/api/articles/{{articleId}}
 Content-Type: application/json
 
@@ -33,5 +31,4 @@ Content-Type: application/json
 }
 
 ### 게시글 삭제
-# @prompt articleId 게시글 ID를 입력하세요
 DELETE http://localhost:5005/api/articles/{{articleId}}
