@@ -1,19 +1,16 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from "./productService.js";
 
 // 상품 등록
-const createProduct = async (req, res) => {
+const createProductController = async (req, res) => {
   try {
     const { name, description, price, tags } = req.body;
-    const product = await prisma.product.create({
-      data: {
-        name,
-        description,
-        price,
-        tags,
-      },
-    });
+    const product = await createProduct(name, description, price, tags);
     res.status(201).send(product);
   } catch (err) {
     res.status(400).send({ message: err.message });
@@ -25,40 +22,11 @@ const createProduct = async (req, res) => {
 // 페이지네이션 적용
 // 검색 기능 추가 - name, description
 
-const getProducts = async (req, res) => {
+const getProductsController = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, keyword } = req.query;
-
-    const where = keyword
-      ? {
-          OR: [
-            { name: { contains: keyword, mode: "insensitive" } },
-            { description: { contains: keyword, mode: "insensitive" } },
-          ],
-        }
-      : {};
-
-    const products = await prisma.product.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
-      skip: (Number(page) - 1) * Number(pageSize),
-      take: Number(pageSize),
-    });
-    const total = await prisma.product.count({ where }); // [products, total] = await Promise.all 로 묶어서 비동기 처리가능
-
-    res.status(200).send({
-      products,
-      total,
-      totalPages: Math.ceil(total / Number(pageSize)),
-      currentPage: Number(page),
-    });
+    const { page, pageSize, keyword } = req.query;
+    const result = await getProducts(page, pageSize, keyword);
+    res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -66,20 +34,10 @@ const getProducts = async (req, res) => {
 
 // 상품 상세 조회
 // id name description price tags createdAt
-const getProductById = async (req, res) => {
+const getProductByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await prisma.product.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        tags: true,
-        createdAt: true,
-      },
-    });
+    const product = await getProductById(id);
 
     if (!product) {
       return res.status(404).send({ message: "Product not found" });
@@ -93,16 +51,11 @@ const getProductById = async (req, res) => {
 // 상품 수정
 // patch 메서드 사용
 // id name description price tags
-const updateProduct = async (req, res) => {
+const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, tags } = req.body;
-
-    const product = await prisma.product.update({
-      where: { id },
-      data: { name, description, price, tags },
-    });
-
+    const product = await updateProduct(id, name, description, price, tags);
     res.status(200).send(product);
   } catch (err) {
     if (err.code === "P2025") {
@@ -113,14 +66,10 @@ const updateProduct = async (req, res) => {
 };
 
 // 상품 삭제
-const deleteProduct = async (req, res) => {
+const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
-
-    await prisma.product.delete({
-      where: { id },
-    });
-
+    await deleteProduct(id);
     res.status(200).send({ message: "Product deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {
@@ -131,9 +80,9 @@ const deleteProduct = async (req, res) => {
 };
 
 export {
-  createProduct,
-  getProducts,
-  getProductById,
-  updateProduct,
-  deleteProduct,
+  createProductController as createProduct,
+  getProductsController as getProducts,
+  getProductByIdController as getProductById,
+  updateProductController as updateProduct,
+  deleteProductController as deleteProduct,
 };
