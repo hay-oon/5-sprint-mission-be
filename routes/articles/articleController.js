@@ -20,8 +20,8 @@ const createArticleController = async (req, res) => {
 // 게시글 목록 조회
 const getArticlesController = async (req, res) => {
   try {
-    const { page, pageSize, keyword } = req.query;
-    const result = await getArticles(page, pageSize, keyword);
+    const { page, limit, keyword, sortBy } = req.query;
+    const result = await getArticles(page, limit, keyword, sortBy);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });

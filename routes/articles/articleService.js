@@ -8,12 +8,18 @@ const createArticle = async (title, content) => {
     data: {
       title,
       content,
+      likeCount: 0,
     },
   });
 };
 
 // 게시글 목록 조회
-const getArticles = async (page = 1, pageSize = 10, keyword) => {
+const getArticles = async (
+  page = 1,
+  limit = 10,
+  keyword,
+  sortBy = "latest"
+) => {
   const where = keyword
     ? {
         OR: [
@@ -23,25 +29,37 @@ const getArticles = async (page = 1, pageSize = 10, keyword) => {
       }
     : {};
 
+  const orderBy =
+    sortBy === "likes" ? { likeCount: "desc" } : { createdAt: "desc" };
+
+  // const orderBy = {};
+  // switch (sortBy) {
+  //   case "likes":
+  //     orderBy.likeCount = "desc";
+  //     break;
+  //   default:
+  //     orderBy.createdAt = "desc";
+  // }
+
   const articles = await prisma.article.findMany({
     where,
     select: {
       id: true,
       title: true,
       content: true,
+      likeCount: true,
       createdAt: true,
     },
-    orderBy: { createdAt: "desc" },
-    skip: (Number(page) - 1) * Number(pageSize),
-    take: Number(pageSize),
+    orderBy,
+    skip: (Number(page) - 1) * Number(limit),
+    take: Number(limit),
   });
 
   const total = await prisma.article.count({ where });
-
   return {
     articles,
     total,
-    totalPages: Math.ceil(total / Number(pageSize)),
+    totalPages: Math.ceil(total / Number(limit)),
     currentPage: Number(page),
   };
 };
@@ -54,6 +72,7 @@ const getArticleById = async (id) => {
       id: true,
       title: true,
       content: true,
+      likeCount: true,
       createdAt: true,
     },
   });
