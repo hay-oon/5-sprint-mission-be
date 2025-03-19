@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 // 게시글 생성
 const createArticle = async (title, content, userId) => {
-  return await prisma.article.create({
+  const article = await prisma.article.create({
     data: {
       title,
       content,
@@ -12,6 +12,29 @@ const createArticle = async (title, content, userId) => {
       favoriteCount: 0,
     },
   });
+
+  // 사용자 정보 별도로 조회
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      nickname: true,
+    },
+  });
+
+  return {
+    id: article.id,
+    title: article.title,
+    content: article.content,
+    favoriteCount: article.favoriteCount,
+    image: null, // 프론트엔드에서 필요한 이미지 필드 추가
+    writer: {
+      id: user.id,
+      nickname: user.nickname,
+    },
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
+  };
 };
 
 // 게시글 목록 조회
@@ -34,31 +57,33 @@ const getArticles = async (
   const orderBy =
     sortBy === "likes" ? { favoriteCount: "desc" } : { createdAt: "desc" };
 
-  // const orderBy = {};
-  // switch (sortBy) {
-  //   case "likes":
-  //     orderBy.likeCount = "desc";
-  //     break;
-  //   default:
-  //     orderBy.createdAt = "desc";
-  // }
-
   const articles = await prisma.article.findMany({
     where,
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      favoriteCount: true,
-      createdAt: true,
-    },
     orderBy,
     skip: (Number(page) - 1) * Number(limit),
     take: Number(limit),
   });
 
+  // 게시글 작성자 정보 조회
+  const userIds = [...new Set(articles.map((article) => article.userId))];
+  const users = await prisma.user.findMany({
+    where: {
+      id: { in: userIds },
+    },
+    select: {
+      id: true,
+      nickname: true,
+    },
+  });
+
+  // 사용자 ID를 키로 하는 매핑 생성
+  const userMap = new Map();
+  users.forEach((user) => {
+    userMap.set(user.id, user);
+  });
+
   // 사용자가 로그인한 경우 각 게시글에 대한 좋아요 상태 확인
-  let articlesWithFavoriteStatus = articles;
+  let articlesWithLikeStatus = articles;
   if (userId) {
     const favorites = await prisma.favorite.findMany({
       where: {
@@ -72,24 +97,52 @@ const getArticles = async (
 
     const favoriteArticleIds = new Set(favorites.map((fav) => fav.articleId));
 
-    articlesWithFavoriteStatus = articles.map((article) => ({
-      ...article,
-      isFavorite: favoriteArticleIds.has(article.id),
-    }));
+    articlesWithLikeStatus = articles.map((article) => {
+      const writer = userMap.get(article.userId);
+      return {
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        favoriteCount: article.favoriteCount,
+        image: null, // 프론트엔드에서 필요한 이미지 필드 추가
+        writer: writer
+          ? {
+              id: writer.id,
+              nickname: writer.nickname,
+            }
+          : null,
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
+        isFavorite: favoriteArticleIds.has(article.id),
+      };
+    });
   } else {
     // 로그인하지 않은 사용자는 모든 게시글을 좋아요하지 않은 상태로 표시
-    articlesWithFavoriteStatus = articles.map((article) => ({
-      ...article,
-      isFavorite: false,
-    }));
+    articlesWithLikeStatus = articles.map((article) => {
+      const writer = userMap.get(article.userId);
+      return {
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        favoriteCount: article.favoriteCount,
+        image: null, // 프론트엔드에서 필요한 이미지 필드 추가
+        writer: writer
+          ? {
+              id: writer.id,
+              nickname: writer.nickname,
+            }
+          : null,
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
+        isFavorite: false,
+      };
+    });
   }
 
   const total = await prisma.article.count({ where });
   return {
-    articles: articlesWithFavoriteStatus,
-    total,
-    totalPages: Math.ceil(total / Number(limit)),
-    currentPage: Number(page),
+    totalCount: total,
+    articles: articlesWithLikeStatus,
   };
 };
 
@@ -97,16 +150,18 @@ const getArticles = async (
 const getArticleById = async (id, userId = null) => {
   const article = await prisma.article.findUnique({
     where: { id },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      favoriteCount: true,
-      createdAt: true,
-    },
   });
 
   if (!article) return null;
+
+  // 작성자 정보 조회
+  const user = await prisma.user.findUnique({
+    where: { id: article.userId },
+    select: {
+      id: true,
+      nickname: true,
+    },
+  });
 
   // 사용자가 로그인한 경우 좋아요 상태 확인
   let isFavorite = false;
@@ -120,22 +175,72 @@ const getArticleById = async (id, userId = null) => {
     isFavorite = !!favorite;
   }
 
-  // 좋아요 상태를 게시글 정보에 추가
+  // 프론트엔드가 원하는 형식으로 데이터 변환
   return {
-    ...article,
+    id: article.id,
+    title: article.title,
+    content: article.content,
+    favoriteCount: article.favoriteCount,
+    image: null, // 프론트엔드에서 필요한 이미지 필드
+    writer: user
+      ? {
+          id: user.id,
+          nickname: user.nickname,
+        }
+      : null,
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
     isFavorite,
   };
 };
 
 // 게시글 수정
-const updateArticle = async (id, title, content) => {
-  return await prisma.article.update({
+const updateArticle = async (id, title, content, userId = null) => {
+  const updatedArticle = await prisma.article.update({
     where: { id },
     data: {
       title,
       content,
     },
   });
+
+  // 작성자 정보 조회
+  const user = await prisma.user.findUnique({
+    where: { id: updatedArticle.userId },
+    select: {
+      id: true,
+      nickname: true,
+    },
+  });
+
+  // 사용자가 로그인한 경우 좋아요 상태 확인
+  let isFavorite = false;
+  if (userId) {
+    const favorite = await prisma.favorite.findFirst({
+      where: {
+        userId,
+        articleId: id,
+      },
+    });
+    isFavorite = !!favorite;
+  }
+
+  return {
+    id: updatedArticle.id,
+    title: updatedArticle.title,
+    content: updatedArticle.content,
+    favoriteCount: updatedArticle.favoriteCount,
+    image: null, // 프론트엔드에서 필요한 이미지 필드
+    writer: user
+      ? {
+          id: user.id,
+          nickname: user.nickname,
+        }
+      : null,
+    createdAt: updatedArticle.createdAt,
+    updatedAt: updatedArticle.updatedAt,
+    isFavorite,
+  };
 };
 
 // 게시글 삭제
@@ -161,13 +266,33 @@ const addFavorite = async (articleId, userId) => {
     const updatedArticle = await tx.article.update({
       where: { id: articleId },
       data: { favoriteCount: { increment: 1 } },
+    });
+
+    // 작성자 정보 조회
+    const user = await tx.user.findUnique({
+      where: { id: updatedArticle.userId },
       select: {
         id: true,
-        favoriteCount: true,
+        nickname: true,
       },
     });
 
-    return updatedArticle;
+    return {
+      id: updatedArticle.id,
+      title: updatedArticle.title,
+      content: updatedArticle.content,
+      favoriteCount: updatedArticle.favoriteCount,
+      image: null, // 프론트엔드에서 필요한 이미지 필드
+      writer: user
+        ? {
+            id: user.id,
+            nickname: user.nickname,
+          }
+        : null,
+      createdAt: updatedArticle.createdAt,
+      updatedAt: updatedArticle.updatedAt,
+      isFavorite: true,
+    };
   });
 };
 
@@ -187,13 +312,33 @@ const removeFavorite = async (articleId, userId) => {
     const updatedArticle = await tx.article.update({
       where: { id: articleId },
       data: { favoriteCount: { decrement: 1 } },
+    });
+
+    // 작성자 정보 조회
+    const user = await tx.user.findUnique({
+      where: { id: updatedArticle.userId },
       select: {
         id: true,
-        favoriteCount: true,
+        nickname: true,
       },
     });
 
-    return updatedArticle;
+    return {
+      id: updatedArticle.id,
+      title: updatedArticle.title,
+      content: updatedArticle.content,
+      favoriteCount: updatedArticle.favoriteCount,
+      image: null, // 프론트엔드에서 필요한 이미지 필드
+      writer: user
+        ? {
+            id: user.id,
+            nickname: user.nickname,
+          }
+        : null,
+      createdAt: updatedArticle.createdAt,
+      updatedAt: updatedArticle.updatedAt,
+      isFavorite: false,
+    };
   });
 };
 

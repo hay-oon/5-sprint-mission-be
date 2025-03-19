@@ -30,7 +30,8 @@ const createArticleController = async (req, res) => {
 const getArticlesController = async (req, res) => {
   try {
     const { page, limit, keyword, sortBy } = req.query;
-    const result = await getArticles(page, limit, keyword, sortBy);
+    const userId = req.user?.id; // 사용자 ID 가져오기 (로그인한 경우)
+    const result = await getArticles(page, limit, keyword, sortBy, userId);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -41,7 +42,8 @@ const getArticlesController = async (req, res) => {
 const getArticleByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const article = await getArticleById(id);
+    const userId = req.user?.id; // 사용자 ID 가져오기 (로그인한 경우)
+    const article = await getArticleById(id, userId);
 
     if (!article) {
       return res.status(404).send({ message: "Article not found" });
@@ -58,8 +60,9 @@ const updateArticleController = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
+    const userId = req.user?.id; // 사용자 ID 가져오기
 
-    const article = await updateArticle(id, title, content);
+    const article = await updateArticle(id, title, content, userId);
     res.status(200).send(article);
   } catch (err) {
     if (err.code === "P2025") {
