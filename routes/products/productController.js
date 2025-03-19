@@ -4,13 +4,22 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  addFavorite,
+  removeFavorite,
+  checkFavorite,
 } from "./productService.js";
 
 // 상품 등록
 const createProductController = async (req, res) => {
   try {
     const { name, description, price, tags } = req.body;
-    const product = await createProduct(name, description, price, tags);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    const product = await createProduct(name, description, price, tags, userId);
     res.status(201).send(product);
   } catch (err) {
     res.status(400).send({ message: err.message });
@@ -79,10 +88,86 @@ const deleteProductController = async (req, res) => {
   }
 };
 
+// 제품 좋아요 추가
+const addFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    // 이미 좋아요를 누른 경우 체크
+    const alreadyFavorite = await checkFavorite(id, userId);
+    if (alreadyFavorite) {
+      return res
+        .status(400)
+        .send({ message: "이미 좋아요를 누른 제품입니다." });
+    }
+
+    const result = await addFavorite(id, userId);
+    res.status(200).send(result);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "제품을 찾을 수 없습니다." });
+    }
+    res.status(500).send({ message: err.message });
+  }
+};
+
+// 제품 좋아요 취소
+const removeFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    // 좋아요를 누르지 않은 경우 체크
+    const hasFavorite = await checkFavorite(id, userId);
+    if (!hasFavorite) {
+      return res
+        .status(400)
+        .send({ message: "좋아요를 누르지 않은 제품입니다." });
+    }
+
+    const result = await removeFavorite(id, userId);
+    res.status(200).send(result);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "제품을 찾을 수 없습니다." });
+    }
+    res.status(500).send({ message: err.message });
+  }
+};
+
+// 제품 좋아요 상태 확인
+const checkFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    const isFavorite = await checkFavorite(id, userId);
+    res.status(200).send({ isFavorite });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
 export {
   createProductController as createProduct,
   getProductsController as getProducts,
   getProductByIdController as getProductById,
   updateProductController as updateProduct,
   deleteProductController as deleteProduct,
+  addFavoriteController as addFavorite,
+  removeFavoriteController as removeFavorite,
+  checkFavoriteController as checkFavorite,
 };

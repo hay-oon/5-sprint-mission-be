@@ -5,14 +5,24 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  addFavorite,
+  removeFavorite,
 } from "./productController.js";
+import {
+  authMiddleware,
+  optionalAuthMiddleware,
+} from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", createProduct);
-router.get("/", getProducts);
-router.get("/:id", getProductById);
-router.patch("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+router.post("/", authMiddleware, createProduct);
+router.get("/", optionalAuthMiddleware, getProducts);
+router.get("/:id", optionalAuthMiddleware, getProductById);
+router.patch("/:id", authMiddleware, updateProduct);
+router.delete("/:id", authMiddleware, deleteProduct);
+
+// 좋아요 관련 라우트
+router.post("/:id/favorite", authMiddleware, addFavorite);
+router.delete("/:id/favorite", authMiddleware, removeFavorite);
 
 export default router;
