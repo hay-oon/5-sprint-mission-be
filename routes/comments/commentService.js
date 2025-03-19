@@ -3,27 +3,71 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const createArticleComment = async (content, articleId) => {
-  return await prisma.comment.create({
+  const comment = await prisma.comment.create({
     data: {
       content,
       articleId,
     },
-    include: {
-      article: true,
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          image: true,
+        },
+      },
     },
   });
+
+  return {
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    writer: {
+      id: comment.user.id,
+      nickname: comment.user.nickname,
+      image: comment.user.image,
+    },
+  };
 };
 
 const createProductComment = async (content, productId) => {
-  return await prisma.comment.create({
+  const comment = await prisma.comment.create({
     data: {
       content,
       productId,
     },
-    include: {
-      product: true,
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          image: true,
+        },
+      },
     },
   });
+
+  return {
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    writer: {
+      id: comment.user.id,
+      nickname: comment.user.nickname,
+      image: comment.user.image,
+    },
+  };
 };
 
 const getArticleComments = async (articleId, cursor) => {
@@ -33,6 +77,14 @@ const getArticleComments = async (articleId, cursor) => {
       id: true,
       content: true,
       createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          image: true,
+        },
+      },
     },
     take: 10,
     ...(cursor && {
@@ -42,8 +94,20 @@ const getArticleComments = async (articleId, cursor) => {
     orderBy: { createdAt: "desc" },
   });
 
+  const formattedComments = comments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    writer: {
+      id: comment.user.id,
+      nickname: comment.user.nickname,
+      image: comment.user.image,
+    },
+  }));
+
   return {
-    comments,
+    comments: formattedComments,
     nextCursor:
       comments.length === 10 ? comments[comments.length - 1].id : null,
   };
@@ -56,6 +120,14 @@ const getProductComments = async (productId, cursor) => {
       id: true,
       content: true,
       createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          image: true,
+        },
+      },
     },
     take: 10,
     ...(cursor && {
@@ -65,21 +137,86 @@ const getProductComments = async (productId, cursor) => {
     orderBy: { createdAt: "desc" },
   });
 
+  const formattedComments = comments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    writer: {
+      id: comment.user.id,
+      nickname: comment.user.nickname,
+      image: comment.user.image,
+    },
+  }));
+
   return {
-    comments,
+    comments: formattedComments,
     nextCursor:
       comments.length === 10 ? comments[comments.length - 1].id : null,
   };
 };
 
 const updateComment = async (id, content) => {
-  return await prisma.comment.update({
+  // 댓글 작성자 확인
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+    select: { userId: true },
+  });
+
+  if (!comment) {
+    throw new Error("댓글을 찾을 수 없습니다.");
+  }
+
+  if (comment.userId !== userId) {
+    throw new Error("댓글을 수정할 권한이 없습니다.");
+  }
+
+  const updatedComment = await prisma.comment.update({
     where: { id },
     data: { content },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          nickname: true,
+          image: true,
+        },
+      },
+    },
   });
+
+  return {
+    id: updatedComment.id,
+    content: updatedComment.content,
+    createdAt: updatedComment.createdAt,
+    updatedAt: updatedComment.updatedAt,
+    writer: {
+      id: updatedComment.user.id,
+      nickname: updatedComment.user.nickname,
+      image: updatedComment.user.image,
+    },
+  };
 };
 
-const deleteComment = async (id) => {
+const deleteComment = async (id, userId) => {
+  // 댓글 작성자 확인
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+    select: { userId: true },
+  });
+
+  if (!comment) {
+    throw new Error("댓글을 찾을 수 없습니다.");
+  }
+
+  if (comment.userId !== userId) {
+    throw new Error("댓글을 삭제할 권한이 없습니다.");
+  }
+
   return await prisma.comment.delete({ where: { id } });
 };
 
