@@ -33,8 +33,9 @@ const createProductController = async (req, res) => {
 
 const getProductsController = async (req, res) => {
   try {
-    const { page, pageSize, keyword } = req.query;
-    const result = await getProducts(page, pageSize, keyword);
+    const { page, pageSize, orderBy, keyword } = req.query;
+    const userId = req.user?.id;
+    const result = await getProducts(page, pageSize, orderBy, keyword, userId);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -46,7 +47,8 @@ const getProductsController = async (req, res) => {
 const getProductByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await getProductById(id);
+    const userId = req.user?.id;
+    const product = await getProductById(id, userId);
 
     if (!product) {
       return res.status(404).send({ message: "Product not found" });
@@ -64,7 +66,15 @@ const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, tags } = req.body;
-    const product = await updateProduct(id, name, description, price, tags);
+    const userId = req.user?.id;
+    const product = await updateProduct(
+      id,
+      name,
+      description,
+      price,
+      tags,
+      userId
+    );
     res.status(200).send(product);
   } catch (err) {
     if (err.code === "P2025") {
@@ -78,7 +88,8 @@ const updateProductController = async (req, res) => {
 const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
-    await deleteProduct(id);
+    const userId = req.user?.id;
+    await deleteProduct(id, userId);
     res.status(200).send({ message: "Product deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {

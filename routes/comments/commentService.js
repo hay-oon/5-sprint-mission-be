@@ -152,7 +152,7 @@ const getProductComments = async (productId, cursor, limit = 10) => {
   }));
 
   return {
-    comments: formattedComments,
+    list: formattedComments,
     nextCursor:
       comments.length === limit ? comments[comments.length - 1].id : null,
   };
