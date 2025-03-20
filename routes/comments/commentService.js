@@ -2,11 +2,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const createArticleComment = async (content, articleId) => {
+const createArticleComment = async (content, articleId, userId) => {
   const comment = await prisma.comment.create({
     data: {
       content,
       articleId,
+      userId,
     },
     select: {
       id: true,
@@ -36,11 +37,12 @@ const createArticleComment = async (content, articleId) => {
   };
 };
 
-const createProductComment = async (content, productId) => {
+const createProductComment = async (content, productId, userId) => {
   const comment = await prisma.comment.create({
     data: {
       content,
       productId,
+      userId,
     },
     select: {
       id: true,
@@ -70,7 +72,7 @@ const createProductComment = async (content, productId) => {
   };
 };
 
-const getArticleComments = async (articleId, cursor) => {
+const getArticleComments = async (articleId, cursor, limit = 10) => {
   const comments = await prisma.comment.findMany({
     where: { articleId },
     select: {
@@ -86,7 +88,7 @@ const getArticleComments = async (articleId, cursor) => {
         },
       },
     },
-    take: 10,
+    take: limit,
     ...(cursor && {
       skip: 1,
       cursor: { id: cursor },
@@ -109,11 +111,11 @@ const getArticleComments = async (articleId, cursor) => {
   return {
     comments: formattedComments,
     nextCursor:
-      comments.length === 10 ? comments[comments.length - 1].id : null,
+      comments.length === limit ? comments[comments.length - 1].id : null,
   };
 };
 
-const getProductComments = async (productId, cursor) => {
+const getProductComments = async (productId, cursor, limit = 10) => {
   const comments = await prisma.comment.findMany({
     where: { productId },
     select: {
@@ -129,7 +131,7 @@ const getProductComments = async (productId, cursor) => {
         },
       },
     },
-    take: 10,
+    take: limit,
     ...(cursor && {
       skip: 1,
       cursor: { id: cursor },
@@ -152,11 +154,11 @@ const getProductComments = async (productId, cursor) => {
   return {
     comments: formattedComments,
     nextCursor:
-      comments.length === 10 ? comments[comments.length - 1].id : null,
+      comments.length === limit ? comments[comments.length - 1].id : null,
   };
 };
 
-const updateComment = async (id, content) => {
+const updateComment = async (id, content, userId) => {
   // 댓글 작성자 확인
   const comment = await prisma.comment.findUnique({
     where: { id },

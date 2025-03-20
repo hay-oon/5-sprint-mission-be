@@ -175,13 +175,12 @@ const getArticleById = async (id, userId = null) => {
     isFavorite = !!favorite;
   }
 
-  // 프론트엔드가 원하는 형식으로 데이터 변환
   return {
     id: article.id,
     title: article.title,
     content: article.content,
     favoriteCount: article.favoriteCount,
-    image: null, // 프론트엔드에서 필요한 이미지 필드
+    image: null,
     writer: user
       ? {
           id: user.id,

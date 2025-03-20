@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) => {
 
     // 사용자 정보 가져오기
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: decoded.id },
       select: { id: true, email: true, nickname: true },
     });
 
@@ -60,7 +60,7 @@ const optionalAuthMiddleware = async (req, res, next) => {
 
     // 사용자 정보 가져오기
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: decoded.id },
       select: { id: true, email: true, nickname: true },
     });
 

@@ -11,7 +11,8 @@ const createArticleCommentController = async (req, res) => {
   try {
     const { content } = req.body;
     const { articleId } = req.params;
-    const comment = await createArticleComment(content, articleId);
+    const userId = req.user?.id;
+    const comment = await createArticleComment(content, articleId, userId);
     res.status(201).send(comment);
   } catch (err) {
     res.status(400).send({ message: err.message });
@@ -22,7 +23,9 @@ const createProductCommentController = async (req, res) => {
   try {
     const { content } = req.body;
     const { productId } = req.params;
-    const comment = await createProductComment(content, productId);
+    const userId = req.user?.id;
+
+    const comment = await createProductComment(content, productId, userId);
     res.status(201).send(comment);
   } catch (err) {
     res.status(400).send({ message: err.message });
@@ -31,9 +34,10 @@ const createProductCommentController = async (req, res) => {
 
 const getArticleCommentsController = async (req, res) => {
   try {
-    const { cursor } = req.query;
+    const { cursor, limit } = req.query;
     const { articleId } = req.params;
-    const result = await getArticleComments(articleId, cursor);
+    const parsedLimit = limit ? parseInt(limit, 10) : 10;
+    const result = await getArticleComments(articleId, cursor, parsedLimit);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -42,9 +46,10 @@ const getArticleCommentsController = async (req, res) => {
 
 const getProductCommentsController = async (req, res) => {
   try {
-    const { cursor } = req.query;
+    const { cursor, limit } = req.query;
     const { productId } = req.params;
-    const result = await getProductComments(productId, cursor);
+    const parsedLimit = limit ? parseInt(limit, 10) : 10;
+    const result = await getProductComments(productId, cursor, parsedLimit);
     res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -55,7 +60,9 @@ const updateCommentController = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
-    const comment = await updateComment(id, content);
+    const userId = req.user?.id;
+
+    const comment = await updateComment(id, content, userId);
     res.status(200).send(comment);
   } catch (err) {
     if (err.code === "P2025") {
@@ -68,7 +75,9 @@ const updateCommentController = async (req, res) => {
 const deleteCommentController = async (req, res) => {
   try {
     const { id } = req.params;
-    await deleteComment(id);
+    const userId = req.user?.id;
+
+    await deleteComment(id, userId);
     res.status(200).send({ message: "Comment deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {
