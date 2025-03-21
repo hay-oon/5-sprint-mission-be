@@ -8,16 +8,13 @@ import {
   addFavorite,
   removeFavorite,
 } from "./productController.js";
-import {
-  authMiddleware,
-  optionalAuthMiddleware,
-} from "../../middleware/authMiddleware.js";
+import { authMiddleware } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, createProduct);
-router.get("/", optionalAuthMiddleware, getProducts);
-router.get("/:id", optionalAuthMiddleware, getProductById);
+router.get("/", getProducts);
+router.get("/:id", authMiddleware, getProductById);
 router.patch("/:id", authMiddleware, updateProduct);
 router.delete("/:id", authMiddleware, deleteProduct);
 

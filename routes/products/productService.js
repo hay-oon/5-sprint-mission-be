@@ -217,6 +217,20 @@ const updateProduct = async (
   images,
   userId
 ) => {
+  // 상품 존재 여부 및 소유권 확인
+  const productCheck = await prisma.product.findUnique({
+    where: { id },
+  });
+
+  if (!productCheck) {
+    throw new Error("상품을 찾을 수 없습니다.");
+  }
+
+  // 현재 사용자가 작성자인지 확인
+  if (productCheck.userId !== userId) {
+    throw new Error("상품을 수정할 권한이 없습니다.");
+  }
+
   // 상품 업데이트
   const product = await prisma.product.update({
     where: { id },
@@ -282,6 +296,11 @@ const deleteProduct = async (id, userId) => {
 
   if (!product) {
     throw new Error("상품을 찾을 수 없습니다.");
+  }
+
+  // 현재 사용자가 작성자인지 확인
+  if (product.userId !== userId) {
+    throw new Error("상품을 삭제할 권한이 없습니다.");
   }
 
   // 사용자 정보 조회

@@ -195,6 +195,20 @@ const getArticleById = async (id, userId = null) => {
 
 // 게시글 수정
 const updateArticle = async (id, title, content, userId = null) => {
+  // 게시글 존재 여부 및 소유권 확인
+  const article = await prisma.article.findUnique({
+    where: { id },
+  });
+
+  if (!article) {
+    throw new Error("게시글을 찾을 수 없습니다.");
+  }
+
+  // 현재 사용자가 작성자인지 확인
+  if (article.userId !== userId) {
+    throw new Error("게시글을 수정할 권한이 없습니다.");
+  }
+
   const updatedArticle = await prisma.article.update({
     where: { id },
     data: {
@@ -243,7 +257,21 @@ const updateArticle = async (id, title, content, userId = null) => {
 };
 
 // 게시글 삭제
-const deleteArticle = async (id) => {
+const deleteArticle = async (id, userId) => {
+  // 게시글 존재 여부 및 소유권 확인
+  const article = await prisma.article.findUnique({
+    where: { id },
+  });
+
+  if (!article) {
+    throw new Error("게시글을 찾을 수 없습니다.");
+  }
+
+  // 현재 사용자가 작성자인지 확인
+  if (article.userId !== userId) {
+    throw new Error("게시글을 삭제할 권한이 없습니다.");
+  }
+
   return await prisma.article.delete({
     where: { id },
   });

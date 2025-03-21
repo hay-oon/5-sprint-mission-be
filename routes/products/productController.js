@@ -67,6 +67,11 @@ const updateProductController = async (req, res) => {
     const { id } = req.params;
     const { name, description, price, tags } = req.body;
     const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
     const product = await updateProduct(
       id,
       name,
@@ -80,6 +85,9 @@ const updateProductController = async (req, res) => {
     if (err.code === "P2025") {
       return res.status(404).send({ message: "Product not found" });
     }
+    if (err.message === "상품을 수정할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
+    }
     res.status(500).send({ message: err.message });
   }
 };
@@ -89,11 +97,19 @@ const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
     await deleteProduct(id, userId);
     res.status(200).send({ message: "Product deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {
       return res.status(404).send({ message: "Product not found" });
+    }
+    if (err.message === "상품을 삭제할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
     }
     res.status(500).send({ message: err.message });
   }

@@ -62,11 +62,18 @@ const updateArticleController = async (req, res) => {
     const { title, content } = req.body;
     const userId = req.user?.id; // 사용자 ID 가져오기
 
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
     const article = await updateArticle(id, title, content, userId);
     res.status(200).send(article);
   } catch (err) {
     if (err.code === "P2025") {
       return res.status(404).send({ message: "Article not found" });
+    }
+    if (err.message === "게시글을 수정할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
     }
     res.status(500).send({ message: err.message });
   }
@@ -76,11 +83,20 @@ const updateArticleController = async (req, res) => {
 const deleteArticleController = async (req, res) => {
   try {
     const { id } = req.params;
-    await deleteArticle(id);
+    const userId = req.user?.id; // 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    await deleteArticle(id, userId);
     res.status(200).send({ message: "Article deleted successfully" });
   } catch (err) {
     if (err.code === "P2025") {
       return res.status(404).send({ message: "Article not found" });
+    }
+    if (err.message === "게시글을 삭제할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
     }
     res.status(500).send({ message: err.message });
   }

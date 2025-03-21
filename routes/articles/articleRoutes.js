@@ -8,16 +8,13 @@ import {
   addFavorite,
   removeFavorite,
 } from "./articleController.js";
-import {
-  authMiddleware,
-  optionalAuthMiddleware,
-} from "../../middleware/authMiddleware.js";
+import { authMiddleware } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, createArticle);
-router.get("/", optionalAuthMiddleware, getArticles);
-router.get("/:id", optionalAuthMiddleware, getArticleById);
+router.get("/", getArticles);
+router.get("/:id", authMiddleware, getArticleById);
 router.patch("/:id", authMiddleware, updateArticle);
 router.delete("/:id", authMiddleware, deleteArticle);
 
