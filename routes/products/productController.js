@@ -12,14 +12,21 @@ import {
 // 상품 등록
 const createProductController = async (req, res) => {
   try {
-    const { name, description, price, tags } = req.body;
+    const { name, description, price, tags, images } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).send({ message: "로그인이 필요합니다." });
     }
 
-    const product = await createProduct(name, description, price, tags, userId);
+    const product = await createProduct(
+      name,
+      description,
+      price,
+      tags,
+      images,
+      userId
+    );
     res.status(201).send(product);
   } catch (err) {
     res.status(400).send({ message: err.message });
@@ -65,7 +72,7 @@ const getProductByIdController = async (req, res) => {
 const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, tags } = req.body;
+    const { name, description, price, tags, images } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -78,6 +85,7 @@ const updateProductController = async (req, res) => {
       description,
       price,
       tags,
+      images,
       userId
     );
     res.status(200).send(product);
