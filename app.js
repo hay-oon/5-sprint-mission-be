@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
 import apiRoutes from "./routes/index.js";
+import { errorHandler, notFoundError } from "./middleware/errorHandler.js";
 
 dotenv.config();
 
@@ -30,6 +31,14 @@ prisma
   });
 
 app.use("/api", apiRoutes);
+
+// 404 에러 처리 - 모든 라우트를 처리한 후에도 요청이 처리되지 않았을 때
+app.use((req, res, next) => {
+  next(notFoundError(`${req.originalUrl} 경로를 찾을 수 없습니다.`));
+});
+
+// 에러 처리 미들웨어 - 항상 라우트 처리 후 마지막에 위치
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {
