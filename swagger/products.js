@@ -51,7 +51,7 @@
 /**
  * @swagger
  * tags:
- *   name: 상품
+ *   name: Products
  *   description: 상품 관리 API
  */
 
@@ -60,7 +60,7 @@
  * /api/products:
  *   post:
  *     summary: 새 상품 등록
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -109,7 +109,7 @@
  *
  *   get:
  *     summary: 상품 목록 조회
- *     tags: [상품]
+ *     tags: [Products]
  *     parameters:
  *       - in: query
  *         name: page
@@ -163,7 +163,7 @@
  * /api/products/{id}:
  *   get:
  *     summary: 특정 상품 조회
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -187,7 +187,7 @@
  *
  *   patch:
  *     summary: 상품 정보 수정
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -242,7 +242,7 @@
  *
  *   delete:
  *     summary: 상품 삭제
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -268,7 +268,7 @@
  * /api/products/{id}/favorite:
  *   post:
  *     summary: 상품 좋아요 추가
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -296,7 +296,7 @@
  *
  *   delete:
  *     summary: 상품 좋아요 취소
- *     tags: [상품]
+ *     tags: [Products]
  *     security:
  *       - bearerAuth: []
  *     parameters:

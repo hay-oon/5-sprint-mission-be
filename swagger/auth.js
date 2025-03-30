@@ -10,7 +10,7 @@
  * /api/auth/signup:
  *   post:
  *     summary: 회원가입
- *     tags: [인증]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -63,7 +63,7 @@
  * /api/auth/signin:
  *   post:
  *     summary: 로그인
- *     tags: [인증]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -115,7 +115,7 @@
  * /api/auth/refresh-token:
  *   post:
  *     summary: 토큰 갱신
- *     tags: [인증]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
