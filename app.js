@@ -7,6 +7,7 @@ import apiRoutes from "./routes/index.js";
 import { errorHandler, notFoundError } from "./middleware/errorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { specs, swaggerUi } from "./swagger.js";
 
 // __dirname 설정 (ES 모듈에서는 __dirname이 기본적으로 제공되지 않음)
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +29,9 @@ app.use(cookieParser());
 
 // 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Swagger 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Prisma 연결 테스트
 prisma
@@ -52,4 +56,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(
+    `API Documentation available at http://localhost:${PORT}/api-docs`
+  );
 });

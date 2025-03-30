@@ -86,7 +86,7 @@ export const login = async (credentials) => {
 };
 
 /**
- * 리프레시 토큰을 이용한 새 액세스 토큰 발급
+ * 리프레시 토큰을 이용한 새 액세스 토큰 발급 (JWT sliding session 적용)
  */
 export const refreshAccessToken = async (refreshToken) => {
   if (!refreshToken) {
@@ -113,7 +113,14 @@ export const refreshAccessToken = async (refreshToken) => {
       { expiresIn: "1h" }
     );
 
-    return { accessToken: newAccessToken };
+    // 새 리프레시 토큰 발급 (sliding session)
+    const newRefreshToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {
     if (
       error.name === "JsonWebTokenError" ||

@@ -89,13 +89,21 @@ export const signin = async (req, res) => {
 export const refreshToken = async (req, res) => {
   try {
     // 서비스 호출하여 토큰 갱신 처리
-    const { accessToken } = await authService.refreshAccessToken(
+    const { accessToken, refreshToken } = await authService.refreshAccessToken(
       req.cookies.refreshToken
     );
+
+    // 새 리프레시 토큰을 쿠키에 설정
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    });
 
     return res.status(200).json({
       message: "토큰이 갱신되었습니다.",
       accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.error("토큰 갱신 오류:", error);
