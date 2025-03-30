@@ -27,8 +27,8 @@ const createProductController = async (req, res) => {
     const product = await createProduct(
       name,
       description,
-      parseInt(price, 10),
-      tags ? JSON.parse(tags) : [],
+      price,
+      tags || [],
       images,
       userId
     );
@@ -94,8 +94,8 @@ const updateProductController = async (req, res) => {
       id,
       name,
       description,
-      price !== undefined ? parseInt(price, 10) : undefined,
-      tags ? JSON.parse(tags) : undefined,
+      price,
+      tags,
       images,
       userId
     );

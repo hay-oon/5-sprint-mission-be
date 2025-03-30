@@ -10,14 +10,32 @@ import {
 } from "./productController.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import upload from "../../middleware/multerConfig.js";
+import {
+  validateProductData,
+  sanitizeProductData,
+} from "../../middleware/productValidation.js";
 
 const router = express.Router();
 
 // 이미지 업로드를 위해 multer 미들웨어 추가 (최대 5개 이미지 업로드 허용)
-router.post("/", authMiddleware, upload.array("images", 5), createProduct);
+router.post(
+  "/",
+  authMiddleware,
+  upload.array("images", 3),
+  sanitizeProductData,
+  validateProductData,
+  createProduct
+);
 router.get("/", getProducts);
 router.get("/:id", authMiddleware, getProductById);
-router.patch("/:id", authMiddleware, upload.array("images", 5), updateProduct);
+router.patch(
+  "/:id",
+  authMiddleware,
+  upload.array("images", 3),
+  sanitizeProductData,
+  validateProductData,
+  updateProduct
+);
 router.delete("/:id", authMiddleware, deleteProduct);
 
 // 좋아요 관련 라우트
