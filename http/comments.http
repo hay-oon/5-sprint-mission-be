@@ -1,0 +1,38 @@
+### 게시글 댓글 작성
+@articleId = c098cff3-8482-4557-bb36-fd58fad65f1d
+@productId = 05818779-505c-4af0-bfba-bc19dda89341
+
+POST http://localhost:5005/api/articles/{{articleId}}/comments
+Content-Type: application/json
+
+{
+    "content": "게시글에 대한 테스트 댓글입니다."
+}
+
+### 상품 댓글 작성
+POST http://localhost:5005/api/products/{{productId}}/comments
+Content-Type: application/json
+
+{
+    "content": "상품에 대한 테스트 댓글입니다."
+}
+
+### 게시글 댓글 목록 조회
+GET http://localhost:5005/api/articles/{{articleId}}/comments
+
+
+### 상품 댓글 목록 조회
+GET http://localhost:5005/api/products/{{productId}}/comments
+
+@commentId = 3f9642f6-f7b3-489b-9160-d5b278975964
+
+### 댓글 수정
+PATCH http://localhost:5005/api/comments/{{commentId}}
+Content-Type: application/json
+
+{
+    "content": "수정된 댓글 내용입니다."
+}
+
+### 댓글 삭제
+DELETE http://localhost:5005/api/comments/{{commentId}}

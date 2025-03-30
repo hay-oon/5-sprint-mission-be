@@ -1,12 +1,38 @@
-import Product from "../../models/Product.js";
+import {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  addFavorite,
+  removeFavorite,
+  checkFavorite,
+} from "./productService.js";
 
 // 상품 등록
-export const createProduct = async (req, res) => {
+const createProductController = async (req, res) => {
   try {
     const { name, description, price, tags } = req.body;
-    const product = new Product({ name, description, price, tags });
-    const savedProduct = await product.save();
-    res.status(201).send(savedProduct);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    // 업로드된 파일들의 경로 추출
+    const images = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
+    const product = await createProduct(
+      name,
+      description,
+      price,
+      tags || [],
+      images,
+      userId
+    );
+    res.status(201).send(product);
   } catch (err) {
     res.status(400).send({ message: err.message });
   }
@@ -17,32 +43,12 @@ export const createProduct = async (req, res) => {
 // 페이지네이션 적용
 // 검색 기능 추가 - name, description
 
-export const getProducts = async (req, res) => {
+const getProductsController = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, keyword } = req.query;
-
-    const query = {};
-    if (keyword) {
-      // 정규식 검색 조건
-      query.$or = [
-        { name: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ];
-    }
-
-    const products = await Product.find(query)
-      .select("id name price createdAt")
-      .sort({ createdAt: -1 }) // 최신 순 정렬
-      .skip((page - 1) * pageSize)
-      .limit(Number(pageSize));
-
-    const total = await Product.countDocuments(query);
-
-    res.status(200).send({
-      products,
-      totalPages: Math.ceil(total / pageSize),
-      currentPage: Number(page),
-    });
+    const { page, pageSize, orderBy, keyword } = req.query;
+    const userId = req.user?.id;
+    const result = await getProducts(page, pageSize, orderBy, keyword, userId);
+    res.status(200).send(result);
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -50,12 +56,12 @@ export const getProducts = async (req, res) => {
 
 // 상품 상세 조회
 // id name description price tags createdAt
-export const getProductById = async (req, res) => {
+const getProductByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).select(
-      "id name description price tags createdAt"
-    );
+    const userId = req.user?.id;
+    const product = await getProductById(id, userId);
+
     if (!product) {
       return res.status(404).send({ message: "Product not found" });
     }
@@ -68,34 +74,146 @@ export const getProductById = async (req, res) => {
 // 상품 수정
 // patch 메서드 사용
 // id name description price tags
-export const updateProduct = async (req, res) => {
+const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const { name, description, price, tags } = req.body;
+    const userId = req.user?.id;
 
-    const product = await Product.findByIdAndUpdate(id, updates, {
-      new: true, // 업데이트된 데이터 반환 by mongoose
-      runValidators: true, // 유효성 검사 실행 by mongoose
-    });
-    if (!product) {
-      return res.status(404).send({ message: "Product not found" });
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
     }
+
+    // 업로드된 새 이미지들의 경로 추출
+    let images = undefined;
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((file) => `/uploads/${file.filename}`);
+    }
+
+    const product = await updateProduct(
+      id,
+      name,
+      description,
+      price,
+      tags,
+      images,
+      userId
+    );
     res.status(200).send(product);
   } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "Product not found" });
+    }
+    if (err.message === "상품을 수정할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
+    }
     res.status(500).send({ message: err.message });
   }
 };
 
 // 상품 삭제
-export const deleteProduct = async (req, res) => {
+const deleteProductController = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
-    if (!product) {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    await deleteProduct(id, userId);
+    res.status(200).send({ message: "Product deleted successfully" });
+  } catch (err) {
+    if (err.code === "P2025") {
       return res.status(404).send({ message: "Product not found" });
     }
-    res.status(200).send({ message: "Product deleted successfully" });
+    if (err.message === "상품을 삭제할 권한이 없습니다.") {
+      return res.status(403).send({ message: err.message });
+    }
+    res.status(500).send({ message: err.message });
+  }
+};
+
+// 제품 좋아요 추가
+const addFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    // 이미 좋아요를 누른 경우 체크
+    const alreadyFavorite = await checkFavorite(id, userId);
+    if (alreadyFavorite) {
+      return res
+        .status(400)
+        .send({ message: "이미 좋아요를 누른 제품입니다." });
+    }
+
+    const result = await addFavorite(id, userId);
+    res.status(200).send(result);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "제품을 찾을 수 없습니다." });
+    }
+    res.status(500).send({ message: err.message });
+  }
+};
+
+// 제품 좋아요 취소
+const removeFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    // 좋아요를 누르지 않은 경우 체크
+    const hasFavorite = await checkFavorite(id, userId);
+    if (!hasFavorite) {
+      return res
+        .status(400)
+        .send({ message: "좋아요를 누르지 않은 제품입니다." });
+    }
+
+    const result = await removeFavorite(id, userId);
+    res.status(200).send(result);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).send({ message: "제품을 찾을 수 없습니다." });
+    }
+    res.status(500).send({ message: err.message });
+  }
+};
+
+// 제품 좋아요 상태 확인
+const checkFavoriteController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id; // 인증 미들웨어를 통해 사용자 ID 가져오기
+
+    if (!userId) {
+      return res.status(401).send({ message: "로그인이 필요합니다." });
+    }
+
+    const isFavorite = await checkFavorite(id, userId);
+    res.status(200).send({ isFavorite });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
+};
+
+export {
+  createProductController as createProduct,
+  getProductsController as getProducts,
+  getProductByIdController as getProductById,
+  updateProductController as updateProduct,
+  deleteProductController as deleteProduct,
+  addFavoriteController as addFavorite,
+  removeFavoriteController as removeFavorite,
+  checkFavoriteController as checkFavorite,
 };
