@@ -36,7 +36,7 @@
 /**
  * @swagger
  * tags:
- *   name: 게시글
+ *   name: Articles
  *   description: 게시글 관리 API
  */
 
@@ -45,7 +45,7 @@
  * /api/articles:
  *   post:
  *     summary: 새 게시글 작성
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -78,7 +78,7 @@
  *
  *   get:
  *     summary: 게시글 목록 조회
- *     tags: [게시글]
+ *     tags: [Articles]
  *     parameters:
  *       - in: query
  *         name: page
@@ -127,7 +127,7 @@
  * /api/articles/{id}:
  *   get:
  *     summary: 특정 게시글 조회
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -151,7 +151,7 @@
  *
  *   patch:
  *     summary: 게시글 수정
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -192,7 +192,7 @@
  *
  *   delete:
  *     summary: 게시글 삭제
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -218,7 +218,7 @@
  * /api/articles/{id}/favorite:
  *   post:
  *     summary: 게시글 좋아요 추가
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -246,7 +246,7 @@
  *
  *   delete:
  *     summary: 게시글 좋아요 취소
- *     tags: [게시글]
+ *     tags: [Articles]
  *     security:
  *       - bearerAuth: []
  *     parameters:

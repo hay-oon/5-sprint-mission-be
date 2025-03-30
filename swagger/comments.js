@@ -35,7 +35,7 @@
 /**
  * @swagger
  * tags:
- *   name: 댓글
+ *   name: Comments
  *   description: 댓글 관리 API
  */
 
@@ -44,7 +44,7 @@
  * /api/articles/{articleId}/comments:
  *   post:
  *     summary: 게시글에 새 댓글 작성
- *     tags: [댓글]
+ *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -86,7 +86,7 @@
  * /api/articles/{articleId}/comments:
  *   get:
  *     summary: 게시글의 댓글 목록 조회
- *     tags: [댓글]
+ *     tags: [Comments]
  *     parameters:
  *       - in: path
  *         name: articleId
@@ -112,7 +112,7 @@
  * /api/products/{productId}/comments:
  *   post:
  *     summary: 상품에 새 댓글 작성
- *     tags: [댓글]
+ *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -154,7 +154,7 @@
  * /api/products/{productId}/comments:
  *   get:
  *     summary: 상품의 댓글 목록 조회
- *     tags: [댓글]
+ *     tags: [Comments]
  *     parameters:
  *       - in: path
  *         name: productId
@@ -180,7 +180,7 @@
  * /api/comments/{id}:
  *   patch:
  *     summary: 댓글 수정
- *     tags: [댓글]
+ *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -224,7 +224,7 @@
  * /api/comments/{id}:
  *   delete:
  *     summary: 댓글 삭제
- *     tags: [댓글]
+ *     tags: [Comments]
  *     security:
  *       - bearerAuth: []
  *     parameters:
