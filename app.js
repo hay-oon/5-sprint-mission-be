@@ -5,6 +5,12 @@ import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
 import apiRoutes from "./routes/index.js";
 import { errorHandler, notFoundError } from "./middleware/errorHandler.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// __dirname 설정 (ES 모듈에서는 __dirname이 기본적으로 제공되지 않음)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -19,6 +25,9 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+// 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Prisma 연결 테스트
 prisma

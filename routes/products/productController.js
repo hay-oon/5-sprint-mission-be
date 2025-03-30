@@ -12,18 +12,23 @@ import {
 // 상품 등록
 const createProductController = async (req, res) => {
   try {
-    const { name, description, price, tags, images } = req.body;
+    const { name, description, price, tags } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).send({ message: "로그인이 필요합니다." });
     }
 
+    // 업로드된 파일들의 경로 추출
+    const images = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
     const product = await createProduct(
       name,
       description,
-      price,
-      tags,
+      parseInt(price, 10),
+      tags ? JSON.parse(tags) : [],
       images,
       userId
     );
@@ -72,19 +77,25 @@ const getProductByIdController = async (req, res) => {
 const updateProductController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, tags, images } = req.body;
+    const { name, description, price, tags } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).send({ message: "로그인이 필요합니다." });
     }
 
+    // 업로드된 새 이미지들의 경로 추출
+    let images = undefined;
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((file) => `/uploads/${file.filename}`);
+    }
+
     const product = await updateProduct(
       id,
       name,
       description,
-      price,
-      tags,
+      price !== undefined ? parseInt(price, 10) : undefined,
+      tags ? JSON.parse(tags) : undefined,
       images,
       userId
     );
