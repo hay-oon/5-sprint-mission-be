@@ -22,7 +22,7 @@ app.use((0, cors_1.default)({
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 // 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
-app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "uploads")));
+app.use("/uploads", express_1.default.static(path_1.default.join(process.cwd(), "uploads")));
 // Swagger 설정
 app.use("/api-docs", swagger_1.swaggerUi.serve, swagger_1.swaggerUi.setup(swagger_1.specs));
 // Prisma 연결 테스트

@@ -44,17 +44,7 @@ const errorHandler_1 = __importDefault(require("../../utils/errorHandler"));
  */
 const signup = async (req, res) => {
     try {
-        const { email, nickname, password, passwordConfirmation } = req.body;
-        // 필수 필드 검증
-        if (!email || !nickname || !password || !passwordConfirmation) {
-            res.status(400).json({ message: "모든 필드를 입력해야 합니다." });
-            return;
-        }
-        // 비밀번호 확인 검증
-        if (password !== passwordConfirmation) {
-            res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
-            return;
-        }
+        const { email, nickname, password } = req.body;
         // 서비스 호출하여 회원가입 처리
         const user = await authService.register({
             email,
@@ -77,13 +67,6 @@ exports.signup = signup;
 const signin = async (req, res) => {
     try {
         const { email, password } = req.body;
-        // 필수 필드 검증
-        if (!email || !password) {
-            res
-                .status(400)
-                .json({ message: "이메일과 비밀번호를 모두 입력해야 합니다." });
-            return;
-        }
         // 서비스 호출하여 로그인 처리
         const { user, accessToken, refreshToken } = await authService.login({
             email,
@@ -113,7 +96,7 @@ exports.signin = signin;
 const refreshToken = async (req, res) => {
     try {
         const typedReq = req;
-        const token = typedReq.cookies.refreshToken;
+        const token = typedReq.cookies.refreshToken || req.body.refreshToken;
         if (!token) {
             res.status(400).json({ message: "리프레시 토큰이 필요합니다." });
             return;

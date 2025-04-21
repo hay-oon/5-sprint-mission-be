@@ -38,11 +38,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const authController = __importStar(require("./auth.controller"));
+const validate_1 = require("../../middleware/validate");
+const schemas_1 = require("../../schemas");
 const router = express_1.default.Router();
 // 회원가입 API
-router.post("/signup", authController.signup);
+router.post("/signup", (0, validate_1.validate)(schemas_1.signupSchema), authController.signup);
 // 로그인 API
-router.post("/signin", authController.signin);
+router.post("/signin", (0, validate_1.validate)(schemas_1.signinSchema), authController.signin);
 // 토큰 갱신 API
-router.post("/refresh-token", authController.refreshToken);
+router.post("/refresh-token", (0, validate_1.validate)(schemas_1.refreshTokenSchema, "body"), authController.refreshToken);
 exports.default = router;

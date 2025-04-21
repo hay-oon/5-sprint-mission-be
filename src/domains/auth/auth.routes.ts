@@ -14,7 +14,7 @@ router.post("/signin", validate(signinSchema), authController.signin);
 // 토큰 갱신 API
 router.post(
   "/refresh-token",
-  validate(refreshTokenSchema, "body"),
+  validate(refreshTokenSchema),
   authController.refreshToken
 );
 

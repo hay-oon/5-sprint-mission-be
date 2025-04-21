@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Swagger 설정
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
