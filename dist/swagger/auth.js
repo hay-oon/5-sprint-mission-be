@@ -1,10 +1,10 @@
+"use strict";
 /**
  * @swagger
  * tags:
  *   name: Auth
  *   description: 사용자 인증 관련 API
  */
-export {};
 /**
  * @swagger
  * /api/auth/signup:

@@ -2,16 +2,15 @@
   "name": "5-sprint-mission-be",
   "version": "1.0.0",
   "description": "TypeScript 마이그레이션 미션 - 백엔드",
-  "main": "app.ts",
-  "type": "module",
+  "main": "src/app.ts",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon --watch \"**/*.ts\" --exec \"node --loader ts-node/esm app.ts\"",
-    "dev:ts": "node --loader ts-node/esm --watch app.ts",
+    "dev": "ts-node src/app.ts",
+    "dev:ts": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node --loader ts-node/esm prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

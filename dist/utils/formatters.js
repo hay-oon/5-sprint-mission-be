@@ -1,27 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createArticleResponseDto = createArticleResponseDto;
+exports.createProductResponseDto = createProductResponseDto;
+exports.attachFavoriteStatus = attachFavoriteStatus;
 /**
- * 데이터 포맷팅을 위한 유틸리티 함수들
+ * article 생성 DTO
  */
-/**
- * 사용자 정보 포맷팅 함수
- * @param user 사용자 객체
- * @returns 포맷팅된 사용자 정보
- */
-export function formatUserInfo(user) {
-    if (!user)
-        return null;
-    return {
-        id: user.id,
-        nickname: user.nickname || null,
-    };
-}
-/**
- * 게시글 응답 DTO 생성 함수
- * @param article 게시글 데이터
- * @param writer 작성자 정보
- * @param isFavorite 좋아요 상태
- * @returns 클라이언트에 반환할 응답 DTO
- */
-export function createArticleResponseDto(article, writer, isFavorite = false) {
+function createArticleResponseDto(article, writer, isFavorite = false) {
     return {
         id: article.id,
         title: article.title,
@@ -31,7 +16,7 @@ export function createArticleResponseDto(article, writer, isFavorite = false) {
         writer: writer
             ? {
                 id: writer.id,
-                nickname: writer.nickname,
+                nickname: writer.nickname || null,
             }
             : null,
         createdAt: article.createdAt,
@@ -40,50 +25,30 @@ export function createArticleResponseDto(article, writer, isFavorite = false) {
     };
 }
 /**
- * 상품 응답 DTO 생성 함수
- * @param product 상품 데이터
- * @param owner 소유자 정보
- * @param isFavorite 좋아요 상태
- * @returns 클라이언트에 반환할 응답 DTO
+ * product 생성 DTO
  */
-export function createProductResponseDto(product, owner, isFavorite = false) {
+function createProductResponseDto(product, owner, isFavorite = false) {
     return {
         id: product.id,
-        title: product.title,
+        name: product.name,
         description: product.description,
         price: product.price,
-        images: product.images?.map((img) => img.url) || [],
-        status: product.status,
-        categoryId: product.categoryId,
-        favoriteCount: product.favoriteCount,
-        ownerId: product.ownerId,
-        ownerNickname: owner?.nickname || null,
+        tags: product.tags || [],
+        images: product.images || [],
         createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        favoriteCount: product.favoriteCount || 0,
+        ownerId: owner?.id || product.userId || "unknown",
+        ownerNickname: owner?.nickname || "Unknown User",
         isFavorite,
     };
 }
 /**
  * 좋아요 상태를 첨부하는 함수
- * @param items 아이템 배열
- * @param favoriteItemIds 좋아요한 아이템 ID 배열
- * @returns 좋아요 상태가 포함된 아이템 배열
  */
-export function attachFavoriteStatus(items, favoriteItemIds) {
+function attachFavoriteStatus(items, favoriteItemIds) {
     return items.map((item) => ({
         ...item,
         isFavorite: favoriteItemIds.has(item.id),
     }));
-}
-/**
- * 데이터 목록 응답 포맷 생성 함수
- * @param items 아이템 배열
- * @param totalCount 전체 아이템 수
- * @returns 표준화된 목록 응답 객체
- */
-export function createListResponse(items, totalCount) {
-    return {
-        items,
-        totalCount,
-        hasMore: false, // 기본값
-    };
 }

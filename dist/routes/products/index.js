@@ -1,2 +1,2 @@
-import productRoutes from "./productRoutes.js";
+import productRoutes from "./product.routes.js";
 export default productRoutes;

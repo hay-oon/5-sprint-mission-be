@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @swagger
  * components:
@@ -47,7 +48,6 @@
  *           format: date-time
  *           description: 수정 날짜
  */
-export {};
 /**
  * @swagger
  * tags:

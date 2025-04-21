@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { createSearchCondition, createPaginationParams, } from "../../utils/prismaHelpers.js";
-import { createArticleResponseDto, formatUserInfo, attachFavoriteStatus, } from "../../utils/formatters.js";
+import { createArticleResponseDto, attachFavoriteStatus, } from "../../utils/formatters.js";
 import { checkResourceExists, verifyPermission, } from "../../utils/authHelpers.js";
 const prisma = new PrismaClient();
 // 게시글 생성
@@ -67,7 +67,12 @@ const getArticles = async (page, limit, keyword, sortBy = "latest", userId = nul
         const writer = userMap.get(article.userId);
         return {
             ...article,
-            writer: formatUserInfo(writer),
+            writer: writer
+                ? {
+                    id: writer.id,
+                    nickname: writer.nickname || null,
+                }
+                : null,
             isFavorite: false,
         };
     });

@@ -1,11 +1,15 @@
-/**
- * 에러 처리 유틸리티
- */
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-/**
- * API 응답을 위한 에러 객체를 생성합니다.
- */
-export function createError(message, statusCode = 500, code) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createError = createError;
+exports.handlePrismaError = handlePrismaError;
+exports.handleError = handleError;
+exports.notFoundError = notFoundError;
+exports.unauthorizedError = unauthorizedError;
+exports.forbiddenError = forbiddenError;
+exports.badRequestError = badRequestError;
+const library_1 = require("@prisma/client/runtime/library");
+// 에러 객체 생성
+function createError(message, statusCode = 500, code) {
     const error = new Error(message);
     error.statusCode = statusCode;
     if (code)
@@ -13,10 +17,10 @@ export function createError(message, statusCode = 500, code) {
     return error;
 }
 /**
- * Prisma 에러를 앱 에러로 변환합니다.
+ * Prisma 에러를 앱 에러로 변환
  */
-export function handlePrismaError(error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+function handlePrismaError(error) {
+    if (error instanceof library_1.PrismaClientKnownRequestError) {
         // 일반적인 Prisma 에러 처리
         switch (error.code) {
             case "P2002": // 고유 제약 조건 위반
@@ -32,34 +36,10 @@ export function handlePrismaError(error) {
     // 일반 에러 처리
     if (error instanceof Error) {
         const appError = error;
-        // 이미 statusCode가 설정된 에러는 그대로 반환
-        if (appError.statusCode) {
+        if (appError.statusCode)
             return appError;
-        }
-        // 메시지에서 상태 코드를 유추하여 설정
-        if (appError.message.includes("권한이 없") ||
-            appError.message.includes("인증")) {
-            appError.statusCode = 403;
-            appError.code = "FORBIDDEN";
-        }
-        else if (appError.message.includes("찾을 수 없")) {
-            appError.statusCode = 404;
-            appError.code = "NOT_FOUND";
-        }
-        else if (appError.message.includes("중복") ||
-            appError.message.includes("이미 존재")) {
-            appError.statusCode = 409;
-            appError.code = "CONFLICT";
-        }
-        else if (appError.message.includes("유효하지 않") ||
-            appError.message.includes("잘못된")) {
-            appError.statusCode = 400;
-            appError.code = "BAD_REQUEST";
-        }
-        else {
-            appError.statusCode = 500;
-            appError.code = "INTERNAL_SERVER_ERROR";
-        }
+        appError.statusCode = 500;
+        appError.code = "INTERNAL_SERVER_ERROR";
         return appError;
     }
     // unknown 타입 에러 처리
@@ -68,7 +48,7 @@ export function handlePrismaError(error) {
 /**
  * 에러를 처리하고 응답을 반환합니다.
  */
-export function handleError(error, res) {
+function handleError(error, res) {
     const appError = handlePrismaError(error);
     // 응답 객체가 있으면 클라이언트에 에러 응답을 보냄
     if (res) {
@@ -86,33 +66,25 @@ export function handleError(error, res) {
 /**
  * NOT_FOUND (404) 에러를 생성합니다.
  */
-export function notFoundError(message = "요청한 리소스를 찾을 수 없습니다") {
+function notFoundError(message = "요청한 리소스를 찾을 수 없습니다") {
     return createError(message, 404, "NOT_FOUND");
 }
 /**
  * UNAUTHORIZED (401) 에러를 생성합니다.
  */
-export function unauthorizedError(message = "로그인이 필요합니다") {
+function unauthorizedError(message = "로그인이 필요합니다") {
     return createError(message, 401, "UNAUTHORIZED");
 }
 /**
  * FORBIDDEN (403) 에러를 생성합니다.
  */
-export function forbiddenError(message = "권한이 없습니다") {
+function forbiddenError(message = "권한이 없습니다") {
     return createError(message, 403, "FORBIDDEN");
 }
 /**
  * BAD_REQUEST (400) 에러를 생성합니다.
  */
-export function badRequestError(message = "잘못된 요청입니다") {
+function badRequestError(message = "잘못된 요청입니다") {
     return createError(message, 400, "BAD_REQUEST");
 }
-/**
- * 사용자 입력 유효성 검사 실패 에러를 생성합니다.
- */
-export function validationError(errors) {
-    const error = createError("입력 데이터가 유효하지 않습니다", 400, "VALIDATION_ERROR");
-    error.meta = { errors };
-    return error;
-}
-export default handleError;
+exports.default = handleError;
