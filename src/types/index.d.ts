@@ -13,16 +13,3 @@ declare namespace Express {
 interface AppError extends Error {
   statusCode?: number;
 }
-
-// Multer 파일 인터페이스 (필요한 경우)
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
-}
