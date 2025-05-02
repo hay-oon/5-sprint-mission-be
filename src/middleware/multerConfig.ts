@@ -1,5 +1,4 @@
 import multer from "multer";
-import path from "path";
 import { S3Client } from "@aws-sdk/client-s3";
 import multerS3 from "multer-s3";
 import { Request } from "express";
@@ -24,9 +23,8 @@ const upload = multer({
       file: Express.Multer.File,
       cb: (error: Error | null, filename: string) => void
     ) => {
-      const uniqueName = `${Date.now()}-${Math.round(
-        Math.random() * 1e9
-      )}${path.extname(file.originalname)}`;
+      // 파일 이름이 중복되는 경우 덮어쓰기 방지
+      const uniqueName = `${Date.now()}-${file.originalname}`;
       cb(null, uniqueName);
     },
   }),
