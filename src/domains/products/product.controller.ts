@@ -27,7 +27,7 @@ export const createProduct = async (
   try {
     const { name, description, price, tags } = req.body;
     const images = req.files
-      ? (req.files as Express.Multer.File[]).map((file) => file.path)
+      ? (req.files as Express.MulterS3.File[]).map((file) => file.location)
       : [];
 
     if (!req.user) {
@@ -118,7 +118,7 @@ export const updateProduct = async (
     const { id } = req.params;
     const { name, description, price, tags } = req.body;
     const images = req.files
-      ? (req.files as Express.Multer.File[]).map((file) => file.path)
+      ? (req.files as Express.MulterS3.File[]).map((file) => file.location)
       : [];
 
     if (!req.user) {

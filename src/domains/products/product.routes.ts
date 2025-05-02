@@ -1,8 +1,6 @@
 import express from "express";
-import { join, extname } from "path";
-import multer from "multer";
-import fs from "fs";
 import { authMiddleware } from "../../middleware/authMiddleware";
+import upload from "../../middleware/multerConfig";
 import {
   createProduct,
   getProducts,
@@ -15,38 +13,6 @@ import {
 } from "./product.controller";
 
 const router = express.Router();
-
-// 업로드 디렉토리 설정
-const uploadDir = join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// 파일 저장 설정
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + extname(file.originalname));
-  },
-});
-
-// 이미지 필터 설정
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif/;
-  const mimetype = allowedTypes.test(file.mimetype);
-  const extname_ = allowedTypes.test(extname(file.originalname).toLowerCase());
-
-  if (mimetype && extname_) {
-    return cb(null, true);
-  } else {
-    cb(
-      new Error("지원되지 않는 파일 형식입니다! (jpg, jpeg, png, gif만 가능)")
-    );
-  }
-};
 
 // 상품 데이터 유효성 검사 미들웨어
 const validateProductData = (req, res, next) => {
@@ -75,13 +41,6 @@ const validateProductData = (req, res, next) => {
 
   next();
 };
-
-// 파일 업로드 설정
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB 제한
-  fileFilter: fileFilter,
-});
 
 // 상품 라우트 설정
 router.post(
