@@ -46,5 +46,5 @@ router.post("/signup", (0, validate_1.validate)(schemas_1.signupSchema), authCon
 // 로그인 API
 router.post("/signin", (0, validate_1.validate)(schemas_1.signinSchema), authController.signin);
 // 토큰 갱신 API
-router.post("/refresh-token", (0, validate_1.validate)(schemas_1.refreshTokenSchema, "body"), authController.refreshToken);
+router.post("/refresh-token", (0, validate_1.validate)(schemas_1.refreshTokenSchema), authController.refreshToken);
 exports.default = router;

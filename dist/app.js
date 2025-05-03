@@ -16,7 +16,7 @@ dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: "*", // 모든 오리진 허용 또는 필요에 따라 특정 도메인 설정
     credentials: true,
 }));
 app.use(express_1.default.json());
@@ -41,8 +41,10 @@ app.use((req, res, next) => {
 });
 // 에러 처리 미들웨어 - 항상 라우트 처리 후 마지막에 위치
 app.use(errorHandler_1.errorHandler);
-const PORT = process.env.PORT || 5005;
-app.listen(PORT, () => {
+const PORT = parseInt(process.env.PORT || "5005", 10);
+const IP = process.env.HOST || "0.0.0.0"; // 모든 네트워크 인터페이스에서 연결 수락
+app.listen(PORT, IP, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
     console.log(`API 문서는 http://localhost:${PORT}/api-docs 에서 확인 가능합니다.`);
+    console.log(`원격 접속 시 http://43.203.195.48:${PORT}/api-docs 에서 확인 가능합니다.`);
 });

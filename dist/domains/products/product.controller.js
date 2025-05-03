@@ -10,7 +10,7 @@ const createProduct = async (req, res) => {
     try {
         const { name, description, price, tags } = req.body;
         const images = req.files
-            ? req.files.map((file) => file.path)
+            ? req.files.map((file) => file.location)
             : [];
         if (!req.user) {
             throw (0, errorHandler_1.unauthorizedError)("로그인이 필요합니다.");
@@ -71,7 +71,7 @@ const updateProduct = async (req, res) => {
         const { id } = req.params;
         const { name, description, price, tags } = req.body;
         const images = req.files
-            ? req.files.map((file) => file.path)
+            ? req.files.map((file) => file.location)
             : [];
         if (!req.user) {
             throw (0, errorHandler_1.unauthorizedError)("로그인이 필요합니다.");
