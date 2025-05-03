@@ -16,7 +16,7 @@ dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
-    origin: "*", // 모든 오리진 허용 또는 필요에 따라 특정 도메인 설정
+    origin: process.env.CORS_ORIGIN || "http://localhost:3000", // 명시적으로 허용할 오리진 설정
     credentials: true,
 }));
 app.use(express_1.default.json());
