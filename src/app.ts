@@ -8,7 +8,12 @@ import apiRoutes from "./domains/index";
 import { errorHandler, notFoundError } from "./middleware/errorHandler";
 import { specs, swaggerUi } from "./swagger/swagger";
 
-dotenv.config();
+dotenv.config({
+  path:
+    process.env.NODE_ENV === "production"
+      ? ".env.production"
+      : ".env.development",
+});
 
 const prisma = new PrismaClient();
 const app = express();

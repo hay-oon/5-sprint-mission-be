@@ -6,6 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const multer_1 = __importDefault(require("multer"));
 const client_s3_1 = require("@aws-sdk/client-s3");
 const multer_s3_1 = __importDefault(require("multer-s3"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config({
+    path: process.env.NODE_ENV === "production"
+        ? ".env.production"
+        : ".env.development",
+});
+console.log("S3_BUCKET:", process.env.AWS_S3_BUCKET);
 // S3 클라이언트 설정
 const s3 = new client_s3_1.S3Client({
     region: process.env.AWS_REGION,

@@ -2,6 +2,14 @@ import multer from "multer";
 import { S3Client } from "@aws-sdk/client-s3";
 import multerS3 from "multer-s3";
 import { Request } from "express";
+import dotenv from "dotenv";
+
+dotenv.config({
+  path:
+    process.env.NODE_ENV === "production"
+      ? ".env.production"
+      : ".env.development",
+});
 
 // S3 클라이언트 설정
 const s3 = new S3Client({

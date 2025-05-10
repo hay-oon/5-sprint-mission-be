@@ -12,7 +12,11 @@ const path_1 = __importDefault(require("path"));
 const index_1 = __importDefault(require("./domains/index"));
 const errorHandler_1 = require("./middleware/errorHandler");
 const swagger_1 = require("./swagger/swagger");
-dotenv_1.default.config();
+dotenv_1.default.config({
+    path: process.env.NODE_ENV === "production"
+        ? ".env.production"
+        : ".env.development",
+});
 const prisma = new client_1.PrismaClient();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
