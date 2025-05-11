@@ -1,3 +1,4 @@
+// NODE_ENV 값에 따라 dotenv 파일 로드
 if (process.env.NODE_ENV === "production") {
   require("dotenv").config({ path: ".env.production" });
 } else {

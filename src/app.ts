@@ -27,6 +27,13 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Health check 엔드포인트
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .json({ status: "ok", message: "서버가 정상적으로 실행 중입니다." });
+});
+
 // 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
