@@ -31,7 +31,10 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res
     .status(200)
-    .json({ status: "ok", message: "서버가 정상적으로 실행 중입니다." });
+    .json({
+      status: "ok",
+      message: "Hello World! 서버가 정상적으로 실행 중입니다.",
+    });
 });
 
 // 정적 파일 제공 설정 - 업로드된 이미지 접근을 위함
