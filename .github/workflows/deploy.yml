@@ -33,4 +33,5 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/pandamkt-backend:latest
             docker stop pandamkt || true
             docker rm pandamkt || true
+            sleep 3
             docker run -d -p 80:3000 --name pandamkt ${{ secrets.DOCKER_USERNAME }}/pandamkt-backend:latest
