@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [main]
+    branches: [express-정하윤-sprint12]
 
 jobs:
   deploy:
