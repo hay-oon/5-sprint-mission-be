@@ -33,4 +33,16 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/pandamkt-backend:latest
             docker stop pandamkt || true
             docker rm pandamkt || true
-            docker run -d -p 80:3000 --name pandamkt ${{ secrets.DOCKER_USERNAME }}/pandamkt-backend:latest
+            docker run -d \
+              -p 80:5005 \
+              --name pandamkt \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e PORT=${{ secrets.PORT }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }} \
+              -e CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }} \
+              ${{ secrets.DOCKER_USERNAME }}/pandamkt-backend:latest
