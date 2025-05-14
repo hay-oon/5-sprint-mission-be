@@ -13,7 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "noImplicitAny": false,
-    "typeRoots": ["./node_modules/@types", "src/types"]
+    "typeRoots": ["./node_modules/@types", "src/types"],
+    "types": ["node", "jest"]
   },
   "ts-node": {
     "esm": false,
